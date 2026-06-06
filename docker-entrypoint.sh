@@ -13,6 +13,16 @@ fi
 
 mkdir -p "$AUTH_DIR"
 
+PERSISTED_CONFIG="${AUTH_DIR}/config.yaml"
+
+if [ -f "$PERSISTED_CONFIG" ]; then
+  echo "[entrypoint] using persisted config from $PERSISTED_CONFIG"
+  cp "$PERSISTED_CONFIG" "$CONFIG_PATH"
+  exec /CLIProxyAPI/CLIProxyAPI --config "$CONFIG_PATH"
+fi
+
+echo "[entrypoint] no persisted config; rendering bootstrap config from env"
+
 cat > "$CONFIG_PATH" <<YAML
 host: "${LISTEN_HOST}"
 port: ${LISTEN_PORT}
@@ -58,5 +68,7 @@ disable-cooling: false
 ws-auth: false
 YAML
 
-echo "[entrypoint] config rendered at $CONFIG_PATH (auth-dir=$AUTH_DIR, port=$LISTEN_PORT)"
-exec /CLIProxyAPI/CLIProxyAPI --config "$CONFIG_PATH"
+echo "[entrypoint] bootstrap config rendered at $CONFIG_PATH (auth-dir=$AUTH_DIR, port=$LISTEN_PORT)"
+echo "[entrypoint] copying bootstrap to persistent volume so future edits survive restarts"
+cp "$CONFIG_PATH" "$PERSISTED_CONFIG"
+exec /CLIProxyAPI/CLIProxyAPI --config "$PERSISTED_CONFIG"
