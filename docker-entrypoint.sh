@@ -4,7 +4,7 @@ set -eu
 CONFIG_PATH="${CONFIG_PATH:-/CLIProxyAPI/config.yaml}"
 AUTH_DIR="${AUTH_DIR:-/root/.cli-proxy-api}"
 LISTEN_HOST="${LISTEN_HOST:-}"
-LISTEN_PORT="${LISTEN_PORT:-8317}"
+LISTEN_PORT="${PORT:-${LISTEN_PORT:-8317}}"
 
 if [ -z "${PROXY_API_KEY:-}" ]; then
   echo "FATAL: PROXY_API_KEY env var must be set" >&2
